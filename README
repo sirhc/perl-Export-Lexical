@@ -1,0 +1,34 @@
+Export-Lexical version 0.0.1
+
+The Export::Lexical module provides a simple interface to the custom user
+pragma interface in Perl 5.10.  Simply by marking subroutines of a module with
+the ":ExportLexical" attribute, they will automatically be flagged for
+lexically scoped import.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Alternatively, to install with Module::Build, you can use the following
+commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+    *   Perl 5.10.0+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2008, Chris Grau <cgrau@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
