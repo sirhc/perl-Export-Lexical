@@ -4,7 +4,7 @@ use base 'Exporter';
 use 5.010;
 use strict;
 use warnings;
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.0.2');
 
 use B;
 
@@ -98,7 +98,7 @@ Export::Lexical - Lexically scoped subroutine imports
 
 =head1 VERSION
 
-This document describes Export::Lexical version 0.0.1
+This document describes Export::Lexical version 0.0.2
 
 =head1 SYNOPSIS
 

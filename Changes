@@ -1,4 +1,7 @@
 Revision history for Export-Lexical
 
+0.0.2  Wed Oct  8 21:12:48 PDT 2008
+    - Added v5.10 requirement to Build.PL and Makefile.PL.
+
 0.0.1  Wed Oct  8 13:26:52 2008
-       Initial release.
+    - Initial release.
