@@ -7,14 +7,6 @@ use warnings;
 use lib 'lib';
 use Export::Lexical;
 
-#sub import {
-#    warn 'import()';
-#}
-
-#sub unimport {
-#    warn 'unimport()';
-#}
-
 sub foo :ExportLexical {
     $_[0]->();
 }
