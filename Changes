@@ -1,5 +1,10 @@
 Revision history for Export-Lexical
 
+0.0.3  Fri Oct 10 17:10:19 PDT 2008
+    - Default behavior is now to raise an exception when the subroutine is not
+      imported into the current scope.
+    - Behavior may be modified with the :silent or :warn parameters.
+
 0.0.2  Wed Oct  8 21:12:48 PDT 2008
     - Added v5.10 requirement to Build.PL and Makefile.PL.
 
