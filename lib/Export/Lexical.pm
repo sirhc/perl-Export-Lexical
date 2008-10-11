@@ -7,10 +7,12 @@ use warnings;
 use version; our $VERSION = qv('0.0.2');
 
 use B;
+use Carp;
 
 our @EXPORT = qw(MODIFY_CODE_ATTRIBUTES);
 
-my %Exports = ();
+my %Exports  = ();
+my %Modifier = ();    # e.g., $Modifier{$pkg} = 'silent'
 
 {
     my ($caller) = caller;
@@ -49,7 +51,7 @@ CHECK {
             no strict 'refs';
             no warnings 'redefine';
 
-            my ($caller) = caller;
+            my $caller = caller;
 
             *{ $caller . '::' . $sub } = sub {
                 my $hints = (caller(0))[10];
@@ -57,8 +59,8 @@ CHECK {
                 given ( $hints->{$key} ) {
                     my $re = qr/\b!$sub\b/;
 
-                    return if $_ ~~ 0;    # no $module
-                    return if /!$sub\b/;  # no $module '$sub'
+                    return _fail( $pkg, $sub ) if $_ ~~ 0;    # no $module
+                    return _fail( $pkg, $sub ) if /!$sub\b/;  # no $module '$sub'
 
                     # use $module
                     # use $module '$sub'
@@ -86,6 +88,38 @@ sub MODIFY_CODE_ATTRIBUTES {
     }
 
     return @unused_attrs;
+}
+
+sub import {
+    my ( $class ) = @_;
+
+    my $caller = caller;
+    my @params = ();
+
+    while ( my $_ = shift ) {
+        if ( /^:(silent|warn)$/ ) {
+            croak qq('$_' requested when '$Modifier{$caller}' already in use)
+                if $Modifier{$caller};
+
+            $Modifier{$caller} = $_;
+            next;
+        }
+
+        push @params, $_;
+    }
+
+    $class->export_to_level( 1, @params );
+}
+
+sub _fail {
+    my ( $pkg, $sub ) = @_;
+
+    given ( $Modifier{$pkg} ) {
+        when (':silent') { return }
+        when (':warn')   { carp "$pkg\::$sub not allowed here" }
+
+        croak "$pkg\::$sub not allowed here";
+    }
 }
 
 1;
@@ -125,7 +159,7 @@ This document describes Export::Lexical version 0.0.2
         no Foo 'bar';    # disables bar()
 
         foo();           # calls foo()
-        bar();           # bar() is a no-op
+        bar();           # throws an exception
     }
 
 =head1 DESCRIPTION
@@ -136,6 +170,28 @@ the C<:ExportLexical> attribute, they will automatically be flagged for
 lexically scoped import.
 
 =head1 INTERFACE 
+
+=head2 Import Modifiers
+
+By default, subroutines not currently exported to the lexical scope will raise
+exceptions when called.  This behavior can be modified in two ways.
+
+=over
+
+=item C<< :silent >>
+
+    use Export::Lexical ':silent';
+
+Causes subroutines not imported into the current lexical scope to be no-ops.
+
+=item C<< :warn >>
+
+    use Export::Lexical ':warn';
+
+Causes subroutines not imported into the current lexical scope to warn with
+carp() instead of dying with croak().
+
+=back
 
 =head2 Subroutine Attributes
 
@@ -185,6 +241,10 @@ No bugs have been reported.
 Do not define C<import()> or C<unimport()> subroutines when using
 Export::Lexical.  These will redefine the subroutines created by the
 Export::Lexical module, disabling the special properties of the attributes.
+
+The C<use> statements are processed at compile time, so having multiple
+statements in the same scope will cause the last one encountered to affect the
+entire scope.
 
 Please report any bugs or feature requests to
 C<bug-export-lexical@rt.cpan.org>, or through the web interface at
