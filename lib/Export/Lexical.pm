@@ -1,5 +1,4 @@
 package Export::Lexical;
-use base 'Exporter';
 
 use 5.010;
 use strict;
@@ -9,36 +8,8 @@ use version; our $VERSION = qv('0.0.3');
 use B;
 use Carp;
 
-our @EXPORT = qw(MODIFY_CODE_ATTRIBUTES);
-
 my %Exports  = ();
 my %Modifier = ();    # e.g., $Modifier{$pkg} = 'silent'
-
-{
-    my ($caller) = caller;
-    my $key = __PACKAGE__ . "/$caller";
-
-    no strict 'refs';
-
-    *{ $caller . '::import' } = sub {
-        my ( $class, @args ) = @_;
-
-        $^H{$key} = @args ? ( join ',', @args ) : 1;
-    };
-
-    *{ $caller . '::unimport' } = sub {
-        my ( $class, @args ) = @_;
-
-        if ( @args ) {
-            # Leave the '1' on the front of the list from a previous 'use
-            # $module', as well as any subs previously imported.
-            $^H{$key} = join ',', $^H{$key}, map { "!$_" } @args;
-        }
-        else {
-            $^H{$key} = 0;
-        }
-    };
-}
 
 CHECK {
     for ( keys %Exports ) {
@@ -46,7 +17,7 @@ CHECK {
             my $obj = B::svref_2object($ref);
             my $pkg = $obj->GV->STASH->NAME;
             my $sub = $obj->GV->NAME;
-            my $key = __PACKAGE__ . '/' . $pkg;
+            my $key = _get_key($pkg);
 
             no strict 'refs';
             no warnings 'redefine';
@@ -94,7 +65,40 @@ sub import {
     my ( $class ) = @_;
 
     my $caller = caller;
+    my $key    = _get_key($caller);
     my @params = ();
+
+    {
+        # Export our subroutines, if necessary.
+        no strict 'refs';
+
+        if ( !exists &{ $caller . '::MODIFY_CODE_ATTRIBUTES' } ) {
+            *{ $caller . '::MODIFY_CODE_ATTRIBUTES' } = \&MODIFY_CODE_ATTRIBUTES;
+        }
+
+        if ( !exists &{ $caller . '::import' } ) {
+            *{ $caller . '::import' } = sub {
+                my ( $class, @args ) = @_;
+
+                $^H{$key} = @args ? ( join ',', @args ) : 1;
+            };
+        }
+
+        if ( !exists &{ $caller . '::unimport' } ) {
+            *{ $caller . '::unimport' } = sub {
+                my ( $class, @args ) = @_;
+
+                if ( @args ) {
+                    # Leave the '1' on the front of the list from a previous 'use
+                    # $module', as well as any subs previously imported.
+                    $^H{$key} = join ',', $^H{$key}, map { "!$_" } @args;
+                }
+                else {
+                    $^H{$key} = 0;
+                }
+            };
+        }
+    }
 
     while ( my $_ = shift ) {
         if ( /^:(silent|warn)$/ ) {
@@ -107,8 +111,12 @@ sub import {
 
         push @params, $_;
     }
+}
 
-    $class->export_to_level( 1, @params );
+sub _get_key {
+    my ($pkg) = @_;
+
+    return __PACKAGE__ . '/' . $pkg;
 }
 
 sub _fail {
