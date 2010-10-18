@@ -1,4 +1,4 @@
-Export-Lexical version 0.0.1
+Export-Lexical version 0.0.4
 
 The Export::Lexical module provides a simple interface to the custom user
 pragma interface in Perl 5.10.  Simply by marking subroutines of a module with
@@ -28,7 +28,7 @@ DEPENDENCIES
 
 COPYRIGHT AND LICENSE
 
-Copyright (c) 2008, Chris Grau <cgrau@cpan.org>
+Copyright (c) 2008 - 2010, Chris Grau <cgrau@cpan.org>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

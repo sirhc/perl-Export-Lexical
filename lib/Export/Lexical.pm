@@ -2,7 +2,7 @@ package Export::Lexical;
 
 use 5.010;
 use strict;
-use version; our $VERSION = qv('0.0.3');
+use version; our $VERSION = qv('0.0.4');
 
 use B;
 use Carp;
@@ -140,7 +140,7 @@ Export::Lexical - Lexically scoped subroutine imports
 
 =head1 VERSION
 
-This document describes Export::Lexical version 0.0.2
+This document describes Export::Lexical version 0.0.4
 
 =head1 SYNOPSIS
 
