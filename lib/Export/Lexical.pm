@@ -7,38 +7,8 @@ use version; our $VERSION = qv('0.0.3');
 use B;
 use Carp;
 
-my %Exports  = ();
-my %Modifier = ();    # e.g., $Modifier{$pkg} = 'silent'
-
-CHECK {
-    for ( keys %Exports ) {
-        for my $ref ( @{ $Exports{$_} } ) {
-            my $obj = B::svref_2object($ref);
-            my $pkg = $obj->GV->STASH->NAME;
-            my $sub = $obj->GV->NAME;
-            my $key = _get_key($pkg);
-
-            no strict 'refs';       ## no critic (ProhibitNoStrict)
-            no warnings 'redefine';
-
-            my $caller = caller;
-
-            *{ $caller . '::' . $sub } = sub {
-                my $hints = (caller(0))[10];
-
-                given ( $hints->{$key} ) {
-                    my $re = qr/\b!$sub\b/;
-
-                    when ( '' )        { return _fail( $pkg, $sub ); }  # no $module
-                    when ( /!$sub\b/ ) { return _fail( $pkg, $sub ); }  # no $module '$sub'
-
-                    when ( /^1\b/ || /\b$sub\b/ ) { goto $ref; }        # use $module
-                                                                        # use $module '$sub'
-                }
-            };
-        }
-    }
-}
+my %Exports_for  = ();
+my %Modifier_for = ();  # e.g., $Modifier_for{$pkg} = 'silent'
 
 sub MODIFY_CODE_ATTRIBUTES {
     my ( $package, $coderef, @attrs ) = @_;
@@ -47,7 +17,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
     while ( my $attr = shift @attrs ) {
         if ( $attr ~~ /^Export_?Lexical$/i ) {
-            push @{ $Exports{$package} }, $coderef;
+            push @{ $Exports_for{$package} }, $coderef;
         }
         else {
             push @unused_attrs, $attr;
@@ -76,6 +46,8 @@ sub import {
             *{ $caller . '::import' } = sub {
                 my ( $class, @args ) = @_;
 
+                _export_all_to( $caller, scalar caller );
+
                 $^H{$key} = @args ? ( join ',', @args ) : 1;
             };
         }
@@ -98,10 +70,10 @@ sub import {
 
     while ( my $_ = shift ) {
         if ( /^:(silent|warn)$/ ) {
-            croak qq('$_' requested when '$Modifier{$caller}' already in use)
-                if $Modifier{$caller};
+            croak qq('$_' requested when '$Modifier_for{$caller}' already in use)
+                if $Modifier_for{$caller};
 
-            $Modifier{$caller} = $_;
+            $Modifier_for{$caller} = $_;
             next;
         }
 
@@ -109,21 +81,53 @@ sub import {
     }
 }
 
-sub _get_key {
-    my ($pkg) = @_;
+sub _export_all_to {
+    my ( $from, $caller ) = @_;
 
-    return __PACKAGE__ . '/' . $pkg;
+    return if !exists $Exports_for{$from};
+
+    for my $ref ( @{ $Exports_for{$from} } ) {
+        my $obj = B::svref_2object($ref);
+        my $pkg = $obj->GV->STASH->NAME;
+        my $sub = $obj->GV->NAME;
+        my $key = _get_key($pkg);
+
+        no strict 'refs';       ## no critic (ProhibitNoStrict)
+        no warnings 'redefine';
+
+        next if exists &{ $caller . '::' . $sub };
+
+        *{ $caller . '::' . $sub } = sub {
+            my $hints = (caller(0))[10];
+
+            given ( $hints->{$key} ) {
+                my $re = qr/\b!$sub\b/;
+
+                when ( '' )        { return _fail( $pkg, $sub ); }  # no $module
+                when ( /!$sub\b/ ) { return _fail( $pkg, $sub ); }  # no $module '$sub'
+
+                when ( /^1\b/ || /\b$sub\b/ ) { goto $ref; }        # use $module
+                                                                    # use $module '$sub'
+            }
+        };
+    }
 }
 
 sub _fail {
     my ( $pkg, $sub ) = @_;
 
-    given ( $Modifier{$pkg} ) {
+    given ( $Modifier_for{$pkg} ) {
         when (':silent') { return }
         when (':warn')   { carp "$pkg\::$sub not allowed here" }
 
         croak "$pkg\::$sub not allowed here";
     }
+}
+
+sub _get_key {
+    my ($pkg) = @_;
+
+    return __PACKAGE__ . '/' . $pkg;
 }
 
 1;
@@ -152,7 +156,7 @@ This document describes Export::Lexical version 0.0.2
         # do something else
     }
 
-    # In a nearby piece of code:
+    # In a nearby piece of code...
 
     use Foo;
 
@@ -240,15 +244,10 @@ None reported.
 
 =head1 BUGS AND LIMITATIONS
 
-No bugs have been reported.
-
 Do not define C<import()> or C<unimport()> subroutines when using
 Export::Lexical.  These will redefine the subroutines created by the
 Export::Lexical module, disabling the special properties of the attributes.
-
-The C<use> statements are processed at compile time, so having multiple
-statements in the same scope will cause the last one encountered to affect the
-entire scope.
+In practice, this probably isn't a big deal.
 
 Please report any bugs or feature requests to
 C<bug-export-lexical@rt.cpan.org>, or through the web interface at
@@ -262,7 +261,7 @@ This module is an expantion of an idea presented by Damian Conway.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2008, Chris Grau C<< <cgrau@cpan.org> >>.  All rights reserved.
+Copyright (c) 2008 - 2010, Chris Grau C<< <cgrau@cpan.org> >>.  All rights reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.  See L<perlartistic>.

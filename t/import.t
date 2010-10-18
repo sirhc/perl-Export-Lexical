@@ -1,23 +1,13 @@
 #!perl -T
 #
-# Test using Export::Lexical in two different packages in the same file.
-# Previously, the constructed subroutines were exported to the calling class
-# during compilation, so only the first class would get them.
+# This test is designed to demonstrate that a module (DoImport) can use
+# another module (DoSilent), which uses Export::Lexical.
 
 use strict;
 use warnings;
 use Test::More tests => 4;
 
-package One;
-use Export::Lexical;
+use lib 't';
+use DoImport;           # Calls made to DoSilent at this point succeed.
 
-package Two;
-use Export::Lexical;
-
-package main;
-
-ok exists &One::import, '&One::import exists';
-ok exists &One::unimport, '&One::unimport exists';
-
-ok exists &Two::import, '&Two::import exists';
-ok exists &Two::unimport, '&Two::unimport exists';
+DoImport->suppressed(); # Calls made to DoSilent at this point silently fail.
