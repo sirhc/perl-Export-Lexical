@@ -29,14 +29,11 @@ CHECK {
                 given ( $hints->{$key} ) {
                     my $re = qr/\b!$sub\b/;
 
-                    return _fail( $pkg, $sub ) if $_ ~~ 0;    # no $module
-                    return _fail( $pkg, $sub ) if /!$sub\b/;  # no $module '$sub'
+                    when ( '' )        { return _fail( $pkg, $sub ); }  # no $module
+                    when ( /!$sub\b/ ) { return _fail( $pkg, $sub ); }  # no $module '$sub'
 
-                    # use $module
-                    # use $module '$sub'
-                    if ( /^1\b/ || /\b$sub\b/ ) {
-                        goto $ref;
-                    }
+                    when ( /^1\b/ || /\b$sub\b/ ) { goto $ref; }        # use $module
+                                                                        # use $module '$sub'
                 }
             };
         }
@@ -61,7 +58,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 }
 
 sub import {
-    my ( $class ) = @_;
+    my ($class) = @_;
 
     my $caller = caller;
     my $key    = _get_key($caller);
@@ -93,7 +90,7 @@ sub import {
                     $^H{$key} = join ',', $^H{$key}, map { "!$_" } @args;
                 }
                 else {
-                    $^H{$key} = 0;
+                    $^H{$key} = '';
                 }
             };
         }
