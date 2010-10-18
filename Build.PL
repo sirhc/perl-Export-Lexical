@@ -15,7 +15,6 @@ my $builder = Module::Build->new(
         'Test::Exception' => 0,
         'Test::Warn'      => 0,
     },
-    requires       => { 'version' => 0, },
     add_to_cleanup => ['Export-Lexical-*'],
 );
 
