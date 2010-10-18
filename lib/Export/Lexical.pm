@@ -257,7 +257,7 @@ L<http://rt.cpan.org>.
 
 Chris Grau C<< <cgrau@cpan.org> >>
 
-This module is an expantion of an idea presented by Damian Conway.
+This module is an expansion of an idea presented by Damian Conway.
 
 =head1 COPYRIGHT AND LICENSE
 
