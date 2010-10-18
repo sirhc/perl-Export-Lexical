@@ -18,7 +18,7 @@ CHECK {
             my $sub = $obj->GV->NAME;
             my $key = _get_key($pkg);
 
-            no strict 'refs';
+            no strict 'refs';       ## no critic (ProhibitNoStrict)
             no warnings 'redefine';
 
             my $caller = caller;
@@ -66,7 +66,7 @@ sub import {
 
     {
         # Export our subroutines, if necessary.
-        no strict 'refs';
+        no strict 'refs';   ## no critic (ProhibitNoStrict)
 
         if ( !exists &{ $caller . '::MODIFY_CODE_ATTRIBUTES' } ) {
             *{ $caller . '::MODIFY_CODE_ATTRIBUTES' } = \&MODIFY_CODE_ATTRIBUTES;
