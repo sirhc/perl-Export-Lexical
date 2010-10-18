@@ -2,7 +2,6 @@ package Export::Lexical;
 
 use 5.010;
 use strict;
-use warnings;
 use version; our $VERSION = qv('0.0.3');
 
 use B;
