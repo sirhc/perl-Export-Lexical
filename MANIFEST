@@ -4,10 +4,6 @@ META.yml # Will be created by "make dist"
 Makefile.PL
 README
 lib/Export/Lexical.pm
-t/00.load.t
-t/01.pod.t
-t/02.pod-coverage.t
-t/03.perl-critic.t
 t/DoFatal.pm
 t/DoSilent.pm
 t/DoWarn.pm
