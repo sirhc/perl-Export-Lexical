@@ -100,13 +100,11 @@ sub _export_all_to {
         *{ $caller . '::' . $sub } = sub {
             my $hints = (caller(0))[10];
 
-            given ( $hints->{$key} ) {
-                when ( '' )        { return _fail( $pkg, $sub ); }  # no $module
-                when ( /!$sub\b/ ) { return _fail( $pkg, $sub ); }  # no $module '$sub'
+            return _fail( $pkg, $sub ) if $hints->{$key} =~ /(?:^$)|(?:!$sub\b)/; # no $module
+                                                                                  # no $module '$sub'
 
-                when ( /^1\b/ || /\b$sub\b/ ) { goto $ref; }        # use $module
-                                                                    # use $module '$sub'
-            }
+            goto $ref if $hints->{$key} =~ /(?:^1\b)|(?:\b$sub\b)/;               # use $module
+                                                                                  # use $module '$sub'
         };
     }
 }
@@ -114,12 +112,16 @@ sub _export_all_to {
 sub _fail {
     my ( $pkg, $sub ) = @_;
 
-    given ( $Modifier_for{$pkg} ) {
-        when (':silent') { return }
-        when (':warn')   { carp "$pkg\::$sub not allowed here" }
-
-        croak "$pkg\::$sub not allowed here";
+    if ( $Modifier_for{$pkg} eq ':silent' ) {
+        return;
     }
+
+    if ( $Modifier_for{$pkg} eq ':warn' ) {
+        carp "$pkg\::$sub not allowed here";
+        return;
+    }
+
+    croak "$pkg\::$sub not allowed here";
 }
 
 sub _get_key {
