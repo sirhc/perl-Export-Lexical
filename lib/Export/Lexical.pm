@@ -101,8 +101,6 @@ sub _export_all_to {
             my $hints = (caller(0))[10];
 
             given ( $hints->{$key} ) {
-                my $re = qr/\b!$sub\b/;
-
                 when ( '' )        { return _fail( $pkg, $sub ); }  # no $module
                 when ( /!$sub\b/ ) { return _fail( $pkg, $sub ); }  # no $module '$sub'
 
