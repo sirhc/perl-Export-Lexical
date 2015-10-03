@@ -5,7 +5,8 @@
 
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 4 + 1;
+use Test::NoWarnings;
 
 use lib 't';
 use DoImport;           # Calls made to DoSilent at this point succeed.

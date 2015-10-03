@@ -4,7 +4,8 @@ use 5.010;
 use strict;
 use warnings;
 use lib 't';
-use Test::More tests => 8;
+use Test::More tests => 8 + 1;
+use Test::NoWarnings;
 use Test::Exception;
 
 use DoFatal;
