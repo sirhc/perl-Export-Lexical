@@ -16,7 +16,7 @@ sub MODIFY_CODE_ATTRIBUTES {
     my @unused_attrs = ();
 
     while ( my $attr = shift @attrs ) {
-        if ( $attr ~~ /^Export_?Lexical$/i ) {
+        if ( $attr =~ /^Export_?Lexical$/i ) {
             push @{ $Exports_for{$package} }, $coderef;
         }
         else {
