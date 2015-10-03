@@ -259,11 +259,20 @@ This module is an expansion of an idea presented by Damian Conway.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008–2015, Christopher D. Grau.
+Copyright 2008-2015, Christopher D. Grau.
 
 This is free software, licensed under the MIT (X11) License.
 
 =head1 SEE ALSO
+
+L<Exporter::Lexical> is another exporter module which provides for lexically
+scoped imports.
+
+L<Lexical::Import> lets you import functions and variables from another
+package into the importing lexical namespace.
+
+L<Exporter::LexicalVars> has a similar name, but it lets you export lexical (my)
+variables from your module.
 
 L<perlpragma>
 
