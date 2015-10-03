@@ -6,7 +6,7 @@ use warnings;
 use B;
 use Carp;
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 my %exports_for  = ();
 my %modifier_for = ();  # e.g., $modifier_for{$pkg} = 'silent'

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-WriteMakefile(
+my %WriteMakefileArgs = (
     NAME                => 'Export::Lexical',
     AUTHOR              => 'Chris Grau <cgrau@cpan.org>',
     VERSION_FROM        => 'lib/Export/Lexical.pm',
@@ -17,6 +17,21 @@ WriteMakefile(
         'Test::Exception'  => 0,
         'Test::Warn'       => 0,
     },
+    "META_MERGE" => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository  => {
+                type => 'git',
+                web  => 'https://github.com/sirhc/perl-Export-Lexical',
+                url  => 'https://github.com/sirhc/perl-Export-Lexical.git',
+            },
+        },
+    },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Export-Lexical-*' },
 );
+
+delete $WriteMakefileArgs{META_MERGE}
+    unless eval { ExtUtils::MakeMaker->VERSION(6.45) };
+
+WriteMakefile(%WriteMakefileArgs);

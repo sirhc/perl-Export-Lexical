@@ -1,5 +1,8 @@
 Revision history for Export::Lexical
 
+0.0.6
+    - Added github repo to dist metadata.
+
 0.0.5  Sat Oct  3 11:32:12 PDT 2015
     - License changed to MIT.
     - Addressed CPAN Testers report
