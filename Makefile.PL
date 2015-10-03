@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
         'Test::Exception'  => 0,
         'Test::Warn'       => 0,
     },
+    "MIN_PERL_VERSION" => 5.01,
     "META_MERGE" => {
         'meta-spec' => { version => 2 },
         resources => {
@@ -33,5 +34,8 @@ my %WriteMakefileArgs = (
 
 delete $WriteMakefileArgs{META_MERGE}
     unless eval { ExtUtils::MakeMaker->VERSION(6.45) };
+
+delete $WriteMakefileArgs{MIN_PERL_VERSION}
+    unless eval { ExtUtils::MakeMaker->VERSION(6.48) };
 
 WriteMakefile(%WriteMakefileArgs);
