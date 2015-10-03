@@ -68,16 +68,16 @@ sub import {
         }
     }
 
-    while ( my $_ = shift ) {
-        if ( /^:(silent|warn)$/ ) {
-            croak qq('$_' requested when '$Modifier_for{$caller}' already in use)
+    while ( my $modifier = shift ) {
+        if ( $modifier =~ /^:(silent|warn)$/ ) {
+            croak qq('$modifier' requested when '$Modifier_for{$caller}' already in use)
                 if $Modifier_for{$caller};
 
-            $Modifier_for{$caller} = $_;
+            $Modifier_for{$caller} = $modifier;
             next;
         }
 
-        push @params, $_;
+        push @params, $modifier;
     }
 }
 
