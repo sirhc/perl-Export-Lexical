@@ -6,7 +6,7 @@ use warnings;
 use B;
 use Carp;
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 my %exports_for  = ();
 my %modifier_for = ();  # e.g., $modifier_for{$pkg} = 'silent'
@@ -141,10 +141,6 @@ __END__
 
 Export::Lexical - Lexically scoped subroutine imports
 
-=head1 VERSION
-
-This document describes Export::Lexical version 0.0.4
-
 =head1 SYNOPSIS
 
     package Foo;
@@ -265,8 +261,7 @@ This module is an expansion of an idea presented by Damian Conway.
 
 Copyright 2008–2015, Christopher D. Grau.
 
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself. See L<perlartistic>.
+This is free software, licensed under the MIT (X11) License.
 
 =head1 SEE ALSO
 

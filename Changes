@@ -1,5 +1,13 @@
 Revision history for Export::Lexical
 
+0.0.5  Sat Oct  3 11:32:12 PDT 2015
+    - License changed to MIT.
+    - Addressed CPAN Testers report
+      <http://www.cpantesters.org/cpan/report/8b13e906-6935-11e5-98c1-2ff5d0d03245>.
+    - Removed use of experimental features (smart match, given/when, my $_).
+    - Removed Build.PL.
+    - Removed t/0*.t tests, which were just silly boilerplate.
+
 0.0.4  Sun Oct 17 21:51:20 PDT 2010
     - Moved subroutine creation and exporting to the import() routine instead
       of the BEGIN implied by 'use'.  This allows multiple packages declared
